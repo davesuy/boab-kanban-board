@@ -1,0 +1,19 @@
+{
+    "name": "davesuy/boab-kanban-board",
+    "authors": [
+        {
+            "name": "Davesuy",
+            "email": "davesuy@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+        
+            "BKB\\": "includes/"
+          
+        }
+    },
+    "require-dev": {
+    }
+}

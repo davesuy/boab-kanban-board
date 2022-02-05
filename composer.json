@@ -1,0 +1,22 @@
+
+{
+    "name": "boab/boab-kanban-board",
+    "description": "Boab Kanban Board with Vue JS",
+    "authors": [
+        {
+            "name": "Dave Ramirez",
+            "email": "davesuywebmaster@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "BKB\\Admin\\": "admin/",
+            "BKB\\Frontend\\": "frontend/",
+            "BKB\\Includes\\": "includes/",
+            "BKB\\Api\\": "api/"
+        }
+    },
+    "require-dev": {
+    }
+}
