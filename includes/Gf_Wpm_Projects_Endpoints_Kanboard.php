@@ -141,20 +141,23 @@ class Gf_Wpm_Projects_Endpoints_Kanboard {
 
 	}
 
-	public function add_task_from_gf($title, $description, $project_id, $assigned_to, $start_at, $due_date) {
+	/**
+	 * Add Task from Kanban Board
+	 */
+
+	public function add_task_kanban_board_func($title , $user, $due_date, $board_id, $board_task_id) {
 
 		global $wpdb;  
 	
 		$date = date('Y-m-d H:i:s');     
 	
-		
 		$table_name = $this->db_table_tasks();     
 	
 		$exists_task_id = $wpdb->insert( $table_name, array(
 			'title' => $title,
-			'description' => $description,
+			//'description' => $description,
 			'estimation' => 0,
-			'start_at' => $start_at,
+			//'start_at' => $start_at,
 			'due_date' => $due_date,
 			'complexity' => NULL,
 			'priority' => 1,
@@ -162,7 +165,7 @@ class Gf_Wpm_Projects_Endpoints_Kanboard {
 			'recurrent' => 0,
 			'status' => 0,
 			'is_private' => 0,
-			'project_id' => $project_id,
+			'project_id' => $this->project_id_boab_aiml_community,
 			'parent_id' => 0,
 			'completed_by' => NULL,
 			'completed_at' => NULL,
@@ -181,15 +184,15 @@ class Gf_Wpm_Projects_Endpoints_Kanboard {
 			//$exists_board_id = $wpdb->insert( $table_boardables,);
 			//$exists_kanboard_id = $wpdb->insert( $table_boardables, );
 	
-			$waiting_task_list_id = $this->waiting_task_list_id;
-			$waiting_kanboard_id = $this->waiting_kanboard_id;
-	
 			$order_task_list =  $this->get_data_order($table_boardables, 'task_list');
 			$order_kanboard =  $this->get_data_order($table_boardables, 'kanboard');
-	
-			$rows = array(
+			
+			/**
+			 * Duplicates Insert Error
+			 */
+			/**$rows = array(
 				array(
-					'board_id' => $waiting_task_list_id,
+					'board_id' => $board_task_id,
 					'board_type' => 'task_list',
 					'boardable_id' => $task_id,
 					'boardable_type' => 'task',
@@ -200,7 +203,7 @@ class Gf_Wpm_Projects_Endpoints_Kanboard {
 					'updated_at' => 0,
 				),
 				array(
-					'board_id' => $waiting_kanboard_id,
+					'board_id' => $board_id,
 					'board_type' => 'kanboard',
 					'boardable_id' => $task_id ,
 					'boardable_type' => 'task',
@@ -211,17 +214,50 @@ class Gf_Wpm_Projects_Endpoints_Kanboard {
 					'updated_at' => 0,
 				)
 			);
-		
+
 			foreach( $rows as $row )
 			{
-				$wpdb->insert( $table_boardables, $row);  
+				$wpdb->insert( $table_boardables, $insert_task_list);  
+			}**/
+			
+
+			
+			$insert_kanban_board =	array(
+				'board_id' => $board_id,
+				'board_type' => 'kanboard',
+				'boardable_id' => $task_id ,
+				'boardable_type' => 'task',
+				'order' => $order_kanboard,
+				'created_by' => 1,
+				'updated_by' => 1,
+				'created_at' => 0,
+				'updated_at' => 0,
+			);
+
+			$insert_task_list =	array(
+				'board_id' => $board_task_id,
+				'board_type' => 'task_list',
+				'boardable_id' => $task_id ,
+				'boardable_type' => 'task',
+				'order' => $order_task_list,
+				'created_by' => 1,
+				'updated_by' => 1,
+				'created_at' => 0,
+				'updated_at' => 0,
+			);
+
+			$wpdb->insert( $table_boardables, $insert_kanban_board);  
+			$wpdb->insert( $table_boardables, $insert_task_list);  
+			
+			if(!empty($user)) {
+				$this->assigned_user($task_id, $user, $this->project_id_boab_aiml_community);
 			}
-	
-			$this->assigned_user($task_id, $assigned_to, $project_id);
-		   
-		}
 		
+			return $task_id;
+		}
+		//return $title.' - '.$user.' - '.$due_date;
 	}
+
 	
 
 	/**
@@ -260,34 +296,10 @@ class Gf_Wpm_Projects_Endpoints_Kanboard {
 		$board_type = "kanboard";
 
 
-		// if($_GET['user']) {
+		// $query = "SELECT $table_tasks.title, $table_tasks.id, $table_tasks.description, $table_assignees.task_id, $table_tasks.start_at, $table_tasks.due_date, $table_assignees.assigned_to, $table_boardables.boardable_id, $table_boardables.board_id, $table_boardables.board_type, $table_boardables.order FROM $table_tasks INNER JOIN $table_assignees ON $table_tasks.id = $table_assignees.task_id INNER JOIN $table_boardables ON $table_tasks.id = $table_boardables.boardable_id WHERE $table_assignees.assigned_to = '{$logged_user_id}' AND $table_assignees.project_id = '{$project_id}' AND $table_boardables.board_id = '{$board_id}' AND $table_boardables.board_type = '{$board_type}' ORDER BY $table_boardables.order ASC
+		// ";
 
-		// 	$logged_user_id = $_GET['user'];
-
-		// } elseif($_GET['user_add']) {
-
-		// 	$val = preg_replace('/[\s\+]/', ' ', $_GET['user_add']);
-
-		// 	$user = get_users(array('search' =>  $val));
-		
-		// 	if (!empty($user))
-		// 		$logged_user_id  = $user[0]->ID;
-
-		// }
-
-		//$logged_user_id = 2;
-
-
-
-
-		//$results = $wpdb->get_results("SELECT $table_tasks.title, $table_tasks.description, $table_tasks.start_at, $table_tasks.due_date, $table_assignees.task_id FROM $table_tasks 
-		//INNER JOIN $table_assignees ON $table_tasks.id = $table_assignees.task_id WHERE $table_assignees.assigned_to = '{$logged_user_id}'
-		//");
-
-		//$query = "SELECT $table_tasks.title, $table_tasks.id, $table_tasks.description, $table_assignees.task_id, $table_tasks.start_at, $table_tasks.due_date, $table_assignees.assigned_to FROM $table_tasks INNER JOIN $table_assignees ON $table_tasks.id = $table_assignees.task_id WHERE $table_assignees.assigned_to = '{$logged_user_id}' AND $table_assignees.project_id = '{$project_id}' ORDER BY $table_tasks.id DESC
-		//";
-
-		$query = "SELECT $table_tasks.title, $table_tasks.id, $table_tasks.description, $table_assignees.task_id, $table_tasks.start_at, $table_tasks.due_date, $table_assignees.assigned_to, $table_boardables.boardable_id, $table_boardables.board_id, $table_boardables.board_type, $table_boardables.order FROM $table_tasks INNER JOIN $table_assignees ON $table_tasks.id = $table_assignees.task_id INNER JOIN $table_boardables ON $table_tasks.id = $table_boardables.boardable_id WHERE $table_assignees.assigned_to = '{$logged_user_id}' AND $table_assignees.project_id = '{$project_id}' AND $table_boardables.board_id = '{$board_id}' AND $table_boardables.board_type = '{$board_type}' ORDER BY $table_boardables.order ASC
+		$query = "SELECT $table_tasks.title, $table_tasks.id, $table_tasks.description, $table_tasks.start_at, $table_tasks.due_date,  $table_boardables.boardable_id, $table_boardables.board_id, $table_boardables.board_type, $table_boardables.order FROM $table_tasks INNER JOIN $table_boardables ON $table_tasks.id = $table_boardables.boardable_id WHERE $table_boardables.board_id = '{$board_id}' AND $table_boardables.board_type = '{$board_type}' ORDER BY $table_boardables.order ASC
 		";
 				
 		$total_query = "SELECT COUNT(1) FROM (${query}) AS combined_table";
@@ -317,11 +329,10 @@ class Gf_Wpm_Projects_Endpoints_Kanboard {
 	
 		$table_tasks = $this->db_table_tasks();      
 		$table_boardables = $this->db_table_boardables(); 
-		
+	
 		$query = $wpdb->prepare("
 		UPDATE $table_boardables
-		SET $table_boardables.board_id = '{$board_id}' WHERE  $table_boardables.boardable_id = {$task_id}
-		");
+		SET $table_boardables.board_id = '{$board_id}' WHERE  $table_boardables.boardable_id = '{$task_id}' ");
 
 		$results = $wpdb->get_results( $query );
 

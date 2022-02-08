@@ -62,12 +62,28 @@ class Frontend {
 
         $project_id = 6;
         $logged_in_user = 2;
-        $board_id_wating = 90;
+        $board_id_waiting = 90;
+        $board_id_waiting_task_list = 86;
         $board_id_inprogress = 91;
+        $board_id_inprogress_task_list = 87;
+        $board_id_ready = 93;
+        $board_id_ready_task_list = 88;
+        $board_id_done = 92;
+        $board_id_done_task_list = 89;
 
         wp_localize_script('bkb-frontend', 'taskData', array( 
-			'task_waiting' => $task_query->query_task_for_user($project_id, $board_id_wating , $logged_in_user ),
+			'task_waiting' => $task_query->query_task_for_user($project_id, $board_id_waiting , $logged_in_user ),
 			'task_inprogress' => $task_query->query_task_for_user( $project_id , $board_id_inprogress, $logged_in_user ),
+            'task_ready' => $task_query->query_task_for_user( $project_id , $board_id_ready, $logged_in_user ),
+            'task_done' => $task_query->query_task_for_user( $project_id , $board_id_done, $logged_in_user ),
+            'board_id_waiting' =>  $board_id_waiting,
+            'board_id_waiting_task_list' => $board_id_waiting_task_list,
+            'board_id_inprogress' =>  $board_id_inprogress,
+            'board_id_inprogress_task_list' => $board_id_inprogress_task_list,
+            'board_id_ready' =>  $board_id_ready,
+            'board_id_ready_task_list' => $board_id_ready_task_list,
+            'board_id_done' =>  $board_id_done,
+            'board_id_done_task_list' => $board_id_done_task_list
 		));
 
     }

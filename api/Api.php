@@ -74,6 +74,36 @@ class Api extends WP_REST_Controller {
                 ]
             ]
         );
+
+        register_rest_route(
+            $this->namespace,
+            '/' . $this->rest_base.'/kanban-board-add',
+            [
+                [
+                    'methods'             => \WP_REST_Server::CREATABLE,
+                    'callback'            => [ $this, 'add_task_kanban_board' ],
+                    'permission_callback' => [ $this, 'get_items_permission_check' ],
+                    'args'                => $this->get_collection_params()
+                ]
+            ]
+        );
+    }
+
+        
+    public function add_task_kanban_board( $request ) {
+
+        $title = $request['title'];
+        $user = $request['user'];
+        $due_date = $request['due_date'];
+        $board_id = $request['board_id'];
+        $board_task_id = $request['board_task_id'];
+
+        $response = $this->endpoints_func->add_task_kanban_board_func( $title , $user, $due_date, $board_id, $board_task_id);  
+
+        return rest_ensure_response( $response );
+
+       //return 'Api.php - '.$title.' - '.$user.' - '.$due_date.' - '.   $board_id .' - '.$board_task_id;
+
     }
 
     
@@ -119,9 +149,9 @@ class Api extends WP_REST_Controller {
 
         $response = $this->endpoints_func->update_kanban_board_id($task_id, $board_id );  
 
-        return rest_ensure_response( $response );
+        //return rest_ensure_response( $response );
 
-        //return  print_r($task_id. ' '.$board_id, true);
+        return  print_r($task_id. ' '.$board_id, true);
 
          //return $request;
 
